@@ -26,8 +26,11 @@
 #include "PhysicsTools/TensorFlow/interface/TfGraphRecord.h"
 #include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
 #include "PhysicsTools/TensorFlow/interface/TfGraphDefWrapper.h"
-
+#include "RecoHGCal/TICL/interface/TracksterInferenceAlgoBase.h"
+#include "FWCore/Framework/interface/ConsumesCollector.h"
+#include "RecoHGCal/TICL/interface/TracksterInferenceAlgoFactory.h"
 using namespace ticl;
+
 
 class TrackstersProducer : public edm::stream::EDProducer<> {
 public:
@@ -49,6 +52,7 @@ private:
   const tensorflow::Session* tfSession_;
   std::unique_ptr<PatternRecognitionAlgoBaseT<TICLLayerTiles>> myAlgo_;
   std::unique_ptr<PatternRecognitionAlgoBaseT<TICLLayerTilesHFNose>> myAlgoHFNose_;
+  std::unique_ptr<TracksterInferenceAlgoBase> inferenceAlgo_; // Add this line
 
   const edm::EDGetTokenT<std::vector<reco::CaloCluster>> clusters_token_;
   const edm::EDGetTokenT<std::vector<float>> filtered_layerclusters_mask_token_;
@@ -89,6 +93,12 @@ TrackstersProducer::TrackstersProducer(const edm::ParameterSet& ps)
     layer_clusters_tiles_token_ = consumes<TICLLayerTiles>(ps.getParameter<edm::InputTag>("layer_clusters_tiles"));
   }
 
+  // Initialize inference algorithm using the factory
+  std::string inferencePlugin = ps.getParameter<std::string>("inferenceAlgo");
+  edm::ParameterSet inferencePSet = ps.getParameter<edm::ParameterSet>("pluginInferenceAlgo" + inferencePlugin);
+  inferenceAlgo_ = std::unique_ptr<TracksterInferenceAlgoBase>(
+      TracksterInferenceAlgoFactory::get()->create(inferencePlugin, inferencePSet));
+
   if (itername_ == "TrkEM")
     iterIndex_ = ticl::Trackster::TRKEM;
   else if (itername_ == "EM")
@@ -105,7 +115,6 @@ TrackstersProducer::TrackstersProducer(const edm::ParameterSet& ps)
 }
 
 void TrackstersProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-  // hgcalMultiClusters
   edm::ParameterSetDescription desc;
   desc.add<std::string>("detector", "HGCAL");
   desc.add<edm::InputTag>("layer_clusters", edm::InputTag("hgcalMergeLayerClusters"));
@@ -118,12 +127,13 @@ void TrackstersProducer::fillDescriptions(edm::ConfigurationDescriptions& descri
   desc.add<std::string>("patternRecognitionBy", "CA");
   desc.add<std::string>("itername", "unknown");
   desc.add<std::string>("tfDnnLabel", "tracksterSelectionTf");
+  desc.add<std::string>("inferenceAlgo", "TracksterInferenceByDNN");
 
   // CA Plugin
   edm::ParameterSetDescription pluginDesc;
   pluginDesc.addNode(edm::PluginDescription<PatternRecognitionFactory>("type", "CA", true));
   desc.add<edm::ParameterSetDescription>("pluginPatternRecognitionByCA", pluginDesc);
-  //
+
   // CLUE3D Plugin
   edm::ParameterSetDescription pluginDescClue3D;
   pluginDescClue3D.addNode(edm::PluginDescription<PatternRecognitionFactory>("type", "CLUE3D", true));
@@ -138,6 +148,15 @@ void TrackstersProducer::fillDescriptions(edm::ConfigurationDescriptions& descri
   edm::ParameterSetDescription pluginDescPassThrough;
   pluginDescPassThrough.addNode(edm::PluginDescription<PatternRecognitionFactory>("type", "Passthrough", true));
   desc.add<edm::ParameterSetDescription>("pluginPatternRecognitionByPassthrough", pluginDescPassThrough);
+
+  // Inference Plugins
+  edm::ParameterSetDescription inferenceDesc;
+  inferenceDesc.addNode(edm::PluginDescription<TracksterInferenceAlgoFactory>("type", "TracksterInferenceByDNN", true));
+  desc.add<edm::ParameterSetDescription>("pluginInferenceAlgoTracksterInferenceByDNN", inferenceDesc);
+
+  edm::ParameterSetDescription inferenceDescANN;
+  inferenceDescANN.addNode(edm::PluginDescription<TracksterInferenceAlgoFactory>("type", "TracksterInferenceByANN", true));
+  desc.add<edm::ParameterSetDescription>("pluginInferenceAlgoTracksterInferenceByANN", inferenceDescANN);
 
   descriptions.add("trackstersProducer", desc);
 }
@@ -183,6 +202,11 @@ void TrackstersProducer::produce(edm::Event& evt, const edm::EventSetup& es) {
 
     myAlgo_->makeTracksters(input, *result, seedToTrackstersAssociation);
   }
+
+  // Run inference algorithm
+  inferenceAlgo_->inputData(*result);
+  inferenceAlgo_->runInference(*result);
+
   // Now update the global mask and put it into the event
   output_mask->reserve(original_layerclusters_mask.size());
   // Copy over the previous state
@@ -193,7 +217,7 @@ void TrackstersProducer::produce(edm::Event& evt, const edm::EventSetup& es) {
     trackster.setIteration(iterIndex_);
     // Mask the used elements, accordingly
     for (auto const v : trackster.vertices()) {
-      // TODO(rovere): for the moment we mask the layer cluster completely. In
+      // TODO: for the moment we mask the layer cluster completely. In
       // the future, properly compute the fraction of usage.
       (*output_mask)[v] = 0.;
     }
