@@ -20,6 +20,7 @@
 #include "DataFormats/HGCalReco/interface/Trackster.h"
 #include "DataFormats/HGCalReco/interface/TICLLayerTile.h"
 #include "DataFormats/HGCalReco/interface/TICLSeedingRegion.h"
+#include "PhysicsTools/ONNXRuntime/interface/ONNXRuntime.h"
 
 #include "RecoHGCal/TICL/plugins/PatternRecognitionPluginFactory.h"
 
@@ -29,8 +30,9 @@
 #include "RecoHGCal/TICL/interface/TracksterInferenceAlgoBase.h"
 #include "FWCore/Framework/interface/ConsumesCollector.h"
 #include "RecoHGCal/TICL/interface/TracksterInferenceAlgoFactory.h"
-using namespace ticl;
 
+using namespace ticl;
+using namespace cms::Ort;
 
 class TrackstersProducer : public edm::stream::EDProducer<> {
 public:
@@ -204,7 +206,7 @@ void TrackstersProducer::produce(edm::Event& evt, const edm::EventSetup& es) {
   }
 
   // Run inference algorithm
-  inferenceAlgo_->inputData(*result);
+  inferenceAlgo_->inputData(layerClusters, *result);
   inferenceAlgo_->runInference(*result);
 
   // Now update the global mask and put it into the event
