@@ -207,7 +207,7 @@ void TrackstersProducer::produce(edm::Event& evt, const edm::EventSetup& es) {
 
   // Run inference algorithm
   inferenceAlgo_->inputData(layerClusters, *result);
-  inferenceAlgo_->runInference(*result);
+  inferenceAlgo_->runInference(*result,"CLU3D", "energyAndPid"); // option to use "Linking" instead of "CLU3D" / "energyAndPid" instead of "PID"
 
   // Now update the global mask and put it into the event
   output_mask->reserve(original_layerclusters_mask.size());
