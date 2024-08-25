@@ -351,51 +351,6 @@ void TICLCandidateProducer::produce(edm::Event &evt, const edm::EventSetup &es) 
     }
   }
 
-<<<<<<< HEAD
-  auto getPathLength =
-      [&](const reco::Track &track, float zVal) {
-        const auto &fts_inn = trajectoryStateTransform::innerFreeState(track, bFieldProd);
-        const auto &fts_out = trajectoryStateTransform::outerFreeState(track, bFieldProd);
-        const auto &surf_inn = trajectoryStateTransform::innerStateOnSurface(track, *trackingGeometry_, bFieldProd);
-        const auto &surf_out = trajectoryStateTransform::outerStateOnSurface(track, *trackingGeometry_, bFieldProd);
-
-        Basic3DVector<float> pos(track.referencePoint());
-        Basic3DVector<float> mom(track.momentum());
-        FreeTrajectoryState stateAtBeamspot{GlobalPoint(pos), GlobalVector(mom), track.charge(), bFieldProd};
-
-        float pathlength = propagator->propagateWithPath(stateAtBeamspot, surf_inn.surface()).second;
-
-        if (pathlength) {
-          const auto &t_inn_out = propagator->propagateWithPath(fts_inn, surf_out.surface());
-
-          if (t_inn_out.first.isValid()) {
-            pathlength += t_inn_out.second;
-
-            std::pair<float, float> rMinMax = hgcons_->rangeR(zVal, true);
-
-            int iSide = int(track.eta() > 0);
-            float zSide = (iSide == 0) ? (-1. * zVal) : zVal;
-            const auto &disk = std::make_unique<GeomDet>(
-                Disk::build(Disk::PositionType(0, 0, zSide),
-                            Disk::RotationType(),
-                            SimpleDiskBounds(rMinMax.first, rMinMax.second, zSide - 0.5, zSide + 0.5))
-                    .get());
-            const auto &tsos = propagator->propagateWithPath(fts_out, disk->surface());
-
-            if (tsos.first.isValid()) {
-              pathlength += tsos.second;
-              return pathlength;
-            }
-          }
-        }
-#ifdef EDM_ML_DEBUG
-        LogDebug("TICLCandidateProducer")
-            << "Not able to use the track to compute the path length. A straight line will be used instead.";
-#endif
-        return 0.f;
-      };
-
-=======
   auto getPathLength = [&](const reco::Track &track, float zVal) {
     const auto &fts_inn = trajectoryStateTransform::innerFreeState(track, bFieldProd);
     const auto &fts_out = trajectoryStateTransform::outerFreeState(track, bFieldProd);
@@ -436,7 +391,6 @@ void TICLCandidateProducer::produce(edm::Event &evt, const edm::EventSetup &es) 
     return 0.f;
   };
 
->>>>>>> 621badd1a21 (do not use trajectories to compute track length)
   assignTimeToCandidates(*resultCandidates, tracks_h, inputTimingView, getPathLength);
 
   evt.put(std::move(resultCandidates));
