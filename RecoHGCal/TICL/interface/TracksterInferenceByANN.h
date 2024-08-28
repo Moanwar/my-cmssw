@@ -1,10 +1,7 @@
 #ifndef RecoHGCal_TICL_TracksterInferenceByANN_H__
 #define RecoHGCal_TICL_TracksterInferenceByANN_H__
 
-#include "PhysicsTools/ONNXRuntime/interface/ONNXRuntime.h"
 #include "RecoHGCal/TICL/interface/TracksterInferenceAlgoBase.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
 
 namespace ticl {
   class TracksterInferenceByANN : public TracksterInferenceAlgoBase {

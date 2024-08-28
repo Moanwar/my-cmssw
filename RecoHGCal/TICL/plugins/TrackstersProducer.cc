@@ -24,10 +24,6 @@
 
 #include "RecoHGCal/TICL/plugins/PatternRecognitionPluginFactory.h"
 
-#include "PhysicsTools/TensorFlow/interface/TfGraphRecord.h"
-#include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
-#include "PhysicsTools/TensorFlow/interface/TfGraphDefWrapper.h"
-
 #include "RecoHGCal/TICL/interface/TracksterInferenceAlgoBase.h"
 #include "FWCore/Framework/interface/ConsumesCollector.h"
 #include "RecoHGCal/TICL/interface/TracksterInferenceAlgoFactory.h"
