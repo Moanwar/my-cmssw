@@ -31,7 +31,7 @@ namespace ticl {
   // Method to process input data and prepare it for inference
   void TracksterInferenceByCNNv4::inputData(const std::vector<reco::CaloCluster>& layerClusters,
                                             std::vector<Trackster>& tracksters) {
-    tracksterIndices.clear();  // Clear previous indices
+    tracksterIndices_.clear();  // Clear previous indices
     for (int i = 0; i < static_cast<int>(tracksters.size()); i++) {
       float sumClusterEnergy = 0.;
       for (const unsigned int& vertex : tracksters[i].vertices()) {
@@ -39,25 +39,25 @@ namespace ticl {
         if (sumClusterEnergy >= eidMinClusterEnergy_) {
           tracksters[i].setRegressedEnergy(0.f);  // Set regressed energy to 0
           tracksters[i].zeroProbabilities();      // Zero out probabilities
-          tracksterIndices.push_back(i);          // Add index to the list
+          tracksterIndices_.push_back(i);         // Add index to the list
           break;
         }
       }
     }
 
     // Prepare input shapes and data for inference
-    batchSize = static_cast<int>(tracksterIndices.size());
-    if (batchSize == 0)
+    batchSize_ = static_cast<int>(tracksterIndices_.size());
+    if (batchSize_ == 0)
       return;  // Exit if no tracksters
 
-    std::vector<int64_t> inputShape = {batchSize, eidNLayers_, eidNClusters_, eidNFeatures_};
-    input_shapes = {inputShape};
+    std::vector<int64_t> inputShape = {batchSize_, eidNLayers_, eidNClusters_, eidNFeatures_};
+    input_shapes_ = {inputShape};
 
-    input_Data.clear();
-    input_Data.emplace_back(batchSize * eidNLayers_ * eidNClusters_ * eidNFeatures_, 0);
+    input_Data_.clear();
+    input_Data_.emplace_back(batchSize_ * eidNLayers_ * eidNClusters_ * eidNFeatures_, 0);
 
-    for (int i = 0; i < batchSize; i++) {
-      const Trackster& trackster = tracksters[tracksterIndices[i]];
+    for (int i = 0; i < batchSize_; i++) {
+      const Trackster& trackster = tracksters[tracksterIndices_[i]];
 
       // Prepare indices and sort clusters based on energy
       std::vector<int> clusterIndices(trackster.vertices().size());
@@ -77,10 +77,10 @@ namespace ticl {
         int j = rhtools_.getLayerWithOffset(cluster.hitsAndFractions()[0].first) - 1;
         if (j < eidNLayers_ && seenClusters[j] < eidNClusters_) {
           auto index = (i * eidNLayers_ + j) * eidNFeatures_ * eidNClusters_ + seenClusters[j] * eidNFeatures_;
-          input_Data[0][index] =
+          input_Data_[0][index] =
               static_cast<float>(cluster.energy() / static_cast<float>(trackster.vertex_multiplicity(k)));
-          input_Data[0][index + 1] = static_cast<float>(std::abs(cluster.eta()));
-          input_Data[0][index + 2] = static_cast<float>(cluster.phi());
+          input_Data_[0][index + 1] = static_cast<float>(std::abs(cluster.eta()));
+          input_Data_[0][index + 2] = static_cast<float>(cluster.phi());
           seenClusters[j]++;
         }
       }
@@ -89,17 +89,17 @@ namespace ticl {
 
   // Method to run inference and update tracksters
   void TracksterInferenceByCNNv4::runInference(std::vector<Trackster>& tracksters) {
-    if (batchSize == 0)
+    if (batchSize_ == 0)
       return;  // Exit if no batch
 
     std::vector<std::vector<float>> outputTensors;
-    outputTensors = onnxSession_->run(inputNames_, input_Data, input_shapes, outputNames_, batchSize);
+    outputTensors = onnxSession_->run(inputNames_, input_Data_, input_shapes_, outputNames_, batchSize_);
     if (doPID_ and doRegression_) {
       // Run energy model inference
       if (!outputNames_.empty()) {
-        for (int i = 0; i < static_cast<int>(batchSize); i++) {
+        for (int i = 0; i < static_cast<int>(batchSize_); i++) {
           const float energy = outputTensors[0][i];
-          tracksters[tracksterIndices[i]].setRegressedEnergy(energy);  // Update energy
+          tracksters[tracksterIndices_[i]].setRegressedEnergy(energy);  // Update energy
         }
       }
     }
@@ -110,9 +110,9 @@ namespace ticl {
         int probsIdx = outputNames_.empty() ? 0 : 1;
         std::vector<float> vec = outputTensors[probsIdx];
         float* probs = vec.data();
-        for (int i = 0; i < batchSize; i++) {
-          tracksters[tracksterIndices[i]].setProbabilities(probs);             // Update probabilities
-          probs += tracksters[tracksterIndices[i]].id_probabilities().size();  // Move to next set of probabilities
+        for (int i = 0; i < batchSize_; i++) {
+          tracksters[tracksterIndices_[i]].setProbabilities(probs);             // Update probabilities
+          probs += tracksters[tracksterIndices_[i]].id_probabilities().size();  // Move to next set of probabilities
         }
       }
     }

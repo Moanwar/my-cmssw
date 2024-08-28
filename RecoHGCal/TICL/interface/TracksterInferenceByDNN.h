@@ -1,10 +1,7 @@
 #ifndef RecoHGCal_TICL_TracksterInferenceByDNN_H__
 #define RecoHGCal_TICL_TracksterInferenceByDNN_H__
 
-#include "PhysicsTools/ONNXRuntime/interface/ONNXRuntime.h"
 #include "RecoHGCal/TICL/interface/TracksterInferenceAlgoBase.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
 #include "RecoLocalCalo/HGCalRecAlgos/interface/RecHitTools.h"
 
 namespace ticl {
@@ -35,10 +32,10 @@ namespace ticl {
     int doRegression_;
 
     hgcal::RecHitTools rhtools_;
-    std::vector<std::vector<int64_t>> input_shapes;
-    std::vector<int> tracksterIndices;
-    std::vector<std::vector<float>> input_Data;
-    int batchSize;
+    std::vector<std::vector<int64_t>> input_shapes_;
+    std::vector<int> tracksterIndices_;
+    std::vector<std::vector<float>> input_Data_;
+    int batchSize_;
   };
 }  // namespace ticl
 
