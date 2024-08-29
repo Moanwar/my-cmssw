@@ -4,6 +4,7 @@ hltTiclTracksterLinks = cms.EDProducer("TracksterLinksProducer",
     detector = cms.string('HGCAL'),
     layer_clusters = cms.InputTag("hltHgcalMergeLayerClusters"),
     layer_clustersTime = cms.InputTag("hltHgcalMergeLayerClusters","timeLayerCluster"),
+    inferenceAlgo = cms.string('TracksterInferenceByDNN'),
     linkingPSet = cms.PSet(
         algo_verbosity = cms.int32(0),
         cylinder_radius_sqr = cms.vdouble(9, 9),
