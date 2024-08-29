@@ -10,6 +10,7 @@ hltTiclTrackstersPassthrough = cms.EDProducer("TrackstersProducer",
     mightGet = cms.optional.untracked.vstring,
     original_mask = cms.InputTag("hltTiclTrackstersCLUE3DHigh"),
     patternRecognitionBy = cms.string('Passthrough'),
+    inferenceAlgo = cms.string('TracksterInferenceByDNN'),
     pluginPatternRecognitionByCA = cms.PSet(
         algo_verbosity = cms.int32(0),
         computeLocalTime = cms.bool(True),

@@ -10,6 +10,7 @@ hltTiclTrackstersCLUE3DHighL1Seeded = cms.EDProducer("TrackstersProducer",
     mightGet = cms.optional.untracked.vstring,
     original_mask = cms.InputTag("hltHgcalMergeLayerClustersL1Seeded","InitialLayerClustersMask"),
     patternRecognitionBy = cms.string('CLUE3D'),
+    inferenceAlgo = cms.string('TracksterInferenceByCNNv4'),
     pluginPatternRecognitionByCA = cms.PSet(
         algo_verbosity = cms.int32(0),
         energy_em_over_total_threshold = cms.double(-1),
@@ -105,7 +106,7 @@ hltTiclTrackstersCLUE3DHighL1Seeded = cms.EDProducer("TrackstersProducer",
         minNumLayerCluster = cms.int32(5),
         type = cms.string('FastJet')
     ),
-    pluginInferenceAlgoTracksterInferenceByDNN = cms.PSet(
+    pluginInferenceAlgoTracksterInferenceByCNN4 = cms.PSet(
         algo_verbosity = cms.int32(0),
         onnxPIDModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv4/onnx_models/energy_id_v0.onnx'),
         onnxEnergyModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv4/onnx_models/energy_id_v0.onnx'),
@@ -114,25 +115,32 @@ hltTiclTrackstersCLUE3DHighL1Seeded = cms.EDProducer("TrackstersProducer",
         eid_min_cluster_energy = cms.double(1),
         eid_n_layers = cms.int32(50),
         eid_n_clusters = cms.int32(10),
-        doPID = cms.int32(0),
+        doPID = cms.int32(1),
         doRegression = cms.int32(0),
         type = cms.string('TracksterInferenceByCNNv4')
     ),
-    pluginInferenceAlgoTracksterInferenceByANN = cms.PSet(
+    pluginInferenceAlgoTracksterInferenceByDNN = cms.PSet(
+        algo_verbosity = cms.int32(0),
+        onnxPIDModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv5/onnx_models/energy_id_v0.onnx'),
+        onnxEnergyModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv5/onnx_models/energy_id_v0.onnx'),
+        inputNames  = cms.string('input'),
+        output_en   = cms.string('enreg_output'),
+        output_id   = cms.string('pid_output'),
+        eid_n_layers = cms.int32(50),
+        eid_n_clusters = cms.int32(10),
+        doPID = cms.int32(1),
+        doRegression = cms.int32(0),
+        type = cms.string('TracksterInferenceByDNN')
+    ),
+     pluginInferenceAlgoTracksterInferenceByANN = cms.PSet(
       algo_verbosity = cms.int32(0),
       type = cms.string('TracksterInferenceByANN')
     
     ),
     seeding_regions = cms.InputTag("hltTiclSeedingL1"),
-    time_layerclusters = cms.InputTag("hltHgcalMergeLayerClustersL1Seeded","timeLayerCluster")
+    time_layerclusters = cms.InputTag("hltHgcalMergeLayerClustersL1Seeded","timeLayerCluster"),
 )
 
 from Configuration.ProcessModifiers.ticl_v5_cff import ticl_v5
 ticl_v5.toModify(hltTiclTrackstersCLUE3DHighL1Seeded.pluginPatternRecognitionByCLUE3D, computeLocalTime = cms.bool(True), doPidCut = cms.bool(False))
-ticl_v5.toModify(hltTiclTrackstersCLUE3DHighL1Seeded.pluginInferenceAlgoTracksterInferenceByDNN, onnxPIDModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv5/onnx_models/patternrecognition/id_v0.onnx'))
-ticl_v5.toModify(hltTiclTrackstersCLUE3DHighL1Seeded.pluginInferenceAlgoTracksterInferenceByDNN, onnxEnergyModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv5/onnx_models/patternrecognition/energy_v0.onnx'))
-ticl_v5.toModify(hltTiclTrackstersCLUE3DHighL1Seeded.pluginInferenceAlgoTracksterInferenceByDNN, type = cms.string('TracksterInferenceByDNN'))
-ticl_v5.toModify(hltTiclTrackstersCLUE3DHighL1Seeded.pluginInferenceAlgoTracksterInferenceByDNN, inputNames  = cms.string('input'))
-ticl_v5.toModify(hltTiclTrackstersCLUE3DHighL1Seeded.pluginInferenceAlgoTracksterInferenceByDNN, output_en   = cms.string('enreg_output'))
-ticl_v5.toModify(hltTiclTrackstersCLUE3DHighL1Seeded.pluginInferenceAlgoTracksterInferenceByDNN, output_id   = cms.string('pid_output'))
-ticl_v5.toModify(hltTiclTrackstersCLUE3DHighL1Seeded.pluginInferenceAlgoTracksterInferenceByDNN, outputNames = cms.untracked.vstring())
+ticl_v5.toModify(hltTiclTrackstersCLUE3DHighL1Seeded.inferenceAlgo, type = cms.string('TracksterInferenceByDNN'))
