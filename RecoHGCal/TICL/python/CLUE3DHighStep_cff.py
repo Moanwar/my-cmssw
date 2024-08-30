@@ -27,10 +27,27 @@ ticlTrackstersCLUE3DHigh = _trackstersProducer.clone(
         doPidCut = True,
         cutHadProb = 999
     ),
-    pluginInferenceAlgoTracksterInferenceByDNN = cms.PSet(
+    inferenceAlgo = cms.string('TracksterInferenceByCNNv4'),
+    pluginInferenceAlgoTracksterInferenceByCNN4 = cms.PSet(
         algo_verbosity = cms.int32(0),
         onnxPIDModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv4/onnx_models/energy_id_v0.onnx'),
         onnxEnergyModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv4/onnx_models/energy_id_v0.onnx'),
+        inputNames  = cms.string('input:0'),
+        outputNames = cms.string("output/regressed_energy:0", "output/id_probabilities:0"),
+        eid_min_cluster_energy = cms.double(1),
+        eid_n_layers = cms.int32(50),
+        eid_n_clusters = cms.int32(10),
+        doPID = cms.int32(1),
+        doRegression = cms.int32(0),
+        type = cms.string('TracksterInferenceByCNNv4')
+    ),
+    pluginInferenceAlgoTracksterInferenceByDNN = cms.PSet(
+        algo_verbosity = cms.int32(0),
+        onnxPIDModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv5/onnx_models/energy_id_v0.onnx'),
+        onnxEnergyModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv5/onnx_models/energy_id_v0.onnx'),
+        inputNames  = cms.string('input'),
+        output_en   = cms.string('enreg_output'),
+        output_id   = cms.string('pid_output'),
         eid_min_cluster_energy = cms.double(1),
         eid_n_layers = cms.int32(50),
         eid_n_clusters = cms.int32(10),
@@ -49,8 +66,7 @@ ticlTrackstersCLUE3DHigh = _trackstersProducer.clone(
 
 from Configuration.ProcessModifiers.ticl_v5_cff import ticl_v5
 ticl_v5.toModify(ticlTrackstersCLUE3DHigh.pluginPatternRecognitionByCLUE3D, computeLocalTime = cms.bool(True))
-ticl_v5.toModify(ticlTrackstersCLUE3DHigh.pluginInferenceAlgoTracksterInferenceByDNN, onnxPIDModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv5/onnx_models/patternrecognition/id_v0.onnx'))
-ticl_v5.toModify(ticlTrackstersCLUE3DHigh.pluginInferenceAlgoTracksterInferenceByDNN, onnxEnergyModelPath = cms.FileInPath('RecoHGCal/TICL/data/RecoHGCal-TICL/ticlv5/onnx_models/patternrecognition/energy_v0.onnx'))
+ticl_v5.toModify(ticlTrackstersCLUE3DHigh.inferenceAlgo, type = cms.string('TracksterInferenceByDNN'))
 
 ticlCLUE3DHighStepTask = cms.Task(ticlSeedingGlobal
     ,filteredLayerClustersCLUE3DHigh
