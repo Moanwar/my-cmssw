@@ -33,10 +33,14 @@ ticlTracksterLinks = _tracksterLinksProducer.clone(
         'ticlTrackstersPassthrough'
     ),
     regressionAndPid = cms.bool(True),
+    inferenceAlgo = cms.string('TracksterInferenceByCNNv4'),
     pluginInferenceAlgoTracksterInferenceByDNN = cms.PSet(
         algo_verbosity = cms.int32(0),
         doPID = cms.int32(1),
         doRegression = cms.int32(1),
+        inputNames  = cms.string('input'),
+        output_en   = cms.string('enreg_output'),
+	output_id   = cms.string('pid_output'),
         eid_min_cluster_energy = cms.double(1),
         eid_n_clusters = cms.int32(10),
         eid_n_layers = cms.int32(50),
