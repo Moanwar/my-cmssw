@@ -129,9 +129,9 @@ void PatternRecognitionbyFastJet<TILES>::makeTracksters(
           fpj.set_user_index(clusterIdx);
           fjInputs.push_back(fpj);
         }  // End of loop on the clusters on currentLayer
-      }    // End of loop over phi-bin region
-    }      // End of loop over eta-bin region
-  }        // End of loop over layers
+      }  // End of loop over phi-bin region
+    }  // End of loop over eta-bin region
+  }  // End of loop over layers
 
   // Collect the jet from the other side wrt to the one taken care of inside the main loop above.
   buildJetAndTracksters(fjInputs, result);
