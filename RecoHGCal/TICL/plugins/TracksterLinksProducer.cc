@@ -52,7 +52,7 @@ using cms::Ort::ONNXRuntime;
 class TracksterLinksProducer : public edm::stream::EDProducer<edm::GlobalCache<ONNXRuntime>> {
 public:
   explicit TracksterLinksProducer(const edm::ParameterSet &ps, const ONNXRuntime *);
-  ~TracksterLinksProducer() override{};
+  ~TracksterLinksProducer() override {};
   void produce(edm::Event &, const edm::EventSetup &) override;
   static void fillDescriptions(edm::ConfigurationDescriptions &descriptions);
 
