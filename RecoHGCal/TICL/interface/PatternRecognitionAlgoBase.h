@@ -30,7 +30,7 @@ namespace ticl {
   public:
     PatternRecognitionAlgoBaseT(const edm::ParameterSet& conf, edm::ConsumesCollector)
         : algo_verbosity_(conf.getParameter<int>("algo_verbosity")) {}
-    virtual ~PatternRecognitionAlgoBaseT(){};
+    virtual ~PatternRecognitionAlgoBaseT() {};
 
     struct Inputs {
       const edm::Event& ev;

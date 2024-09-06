@@ -529,9 +529,9 @@ void PatternRecognitionbyCLUE3D<TILES>::calculateLocalDensity(
               }
             }
           }  // end of loop on possible compatible clusters
-        }    // end of loop over phi-bin region
-      }      // end of loop over eta-bin region
-    }        // end of loop on the sibling layers
+        }  // end of loop over phi-bin region
+      }  // end of loop over eta-bin region
+    }  // end of loop on the sibling layers
     if (rescaleDensityByZ_) {
       if (PatternRecognitionAlgoBaseT<TILES>::algo_verbosity_ > VerbosityLevel::Advanced) {
         edm::LogVerbatim("PatternRecognitionbyCLUE3D")
@@ -640,9 +640,9 @@ void PatternRecognitionbyCLUE3D<TILES>::calculateDistanceToHigher(
               i_nearestHigher = layerandSoa;
             }
           }  // End of loop on clusters
-        }    // End of loop on phi bins
-      }      // End of loop on eta bins
-    }        // End of loop on layers
+        }  // End of loop on phi bins
+      }  // End of loop on eta bins
+    }  // End of loop on layers
 
     clustersOnLayer.delta[i] = nearest_distances;
     clustersOnLayer.nearestHigher[i] = i_nearestHigher;
