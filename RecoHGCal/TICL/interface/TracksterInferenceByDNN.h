@@ -5,7 +5,6 @@
 #include "RecoLocalCalo/HGCalRecAlgos/interface/RecHitTools.h"
 
 namespace ticl {
-  using namespace cms::Ort;
 
   class TracksterInferenceByDNN : public TracksterInferenceAlgoBase {
   public:

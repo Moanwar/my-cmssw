@@ -101,8 +101,8 @@ namespace ticl {
 
     if (doPID_ and doRegression_) {
       // Run energy model inference
-      auto& energyOutputTensor =
-          onnxEnergySession_->run(inputNames_, input_Data_, input_shapes_, output_en_, batchSize_)[0];
+      auto result = onnxEnergySession_->run(inputNames_, input_Data_, input_shapes_, output_en_, batchSize_);
+      auto& energyOutputTensor = result[0]; 
       if (!output_en_.empty()) {
         for (int i = 0; i < static_cast<int>(batchSize_); i++) {
           const float energy = energyOutputTensor[i];
