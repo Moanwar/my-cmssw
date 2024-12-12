@@ -24,9 +24,9 @@ PoolDBESSource = cms.ESSource("PoolDBESSource",
     cms.PSet( record = cms.string('PCaloTowerRcd'    ),
               tag = cms.string('CTRECO_Geometry_Test01')),
     cms.PSet( record = cms.string('PZdcRcd'          ),
-              tag = cms.string('ZDCRECO_Geometry_Test01')),
-    cms.PSet( record = cms.string('PCastorRcd'       ),
-              tag = cms.string('CASTORRECO_Geometry_Test01'))
+              tag = cms.string('ZDCRECO_Geometry_Test01'))
+    #cms.PSet( record = cms.string('PCastorRcd'       ),
+    #          tag = cms.string('CASTORRECO_Geometry_Test01'))
     ),
                               BlobStreamerName = cms.untracked.string('TBufferBlobStreamingService'),
                               timetype = cms.untracked.string('runnumber')

@@ -61,7 +61,7 @@ CaloGeometryBuilder::CaloGeometryBuilder(const edm::ParameterSet& iConfig) {
 
   makeToken(cc, caloList, HcalGeometry::producerTag(), hcalToken_);
   makeToken(cc, caloList, ZdcGeometry::producerTag(), zdcToken_);
-  makeToken(cc, caloList, CastorGeometry::producerTag(), castorToken_);
+  //makeToken(cc, caloList, CastorGeometry::producerTag(), castorToken_);
   makeToken(cc, caloList, EcalBarrelGeometry::producerTag(), ecalBarrelToken_);
   makeToken(cc, caloList, EcalEndcapGeometry::producerTag(), ecalEndcapToken_);
   makeToken(cc, caloList, EcalPreshowerGeometry::producerTag(), ecalPreshowerToken_);
@@ -110,11 +110,11 @@ CaloGeometryBuilder::ReturnType CaloGeometryBuilder::produceAligned(const CaloGe
     auto const& pG = iRecord.get(zdcToken_);
     pCalo->setSubdetGeometry(DetId::Calo, HcalZDCDetId::SubdetectorId, &pG);
   }
-  if (castorToken_.isInitialized()) {
-    edm::LogVerbatim("CaloGeometryBuilder") << "Building CASTOR reconstruction geometry";
-    auto const& pG = iRecord.get(castorToken_);
-    pCalo->setSubdetGeometry(DetId::Calo, HcalCastorDetId::SubdetectorId, &pG);
-  }
+  //if (castorToken_.isInitialized()) {
+  //edm::LogVerbatim("CaloGeometryBuilder") << "Building CASTOR reconstruction geometry";
+  //auto const& pG = iRecord.get(castorToken_);
+  //pCalo->setSubdetGeometry(DetId::Calo, HcalCastorDetId::SubdetectorId, &pG);
+  //}
 
   // look for Ecal Barrel
   if (ecalBarrelToken_.isInitialized()) {
